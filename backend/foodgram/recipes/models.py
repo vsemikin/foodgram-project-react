@@ -1,8 +1,8 @@
 from colorfield.fields import ColorField
-from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.db import models
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 
 class Recipe(models.Model):
