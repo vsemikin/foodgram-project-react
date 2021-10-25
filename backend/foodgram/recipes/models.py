@@ -28,12 +28,22 @@ class Recipe(models.Model):
 
 class Tag(models.Model):
     """The model describes the tags for fetching by recipes."""
-    name = models.CharField("Название", max_length=100)
-    color = ColorField("Цвет", format="hexa")
-    slug = models.SlugField("Ярлык", unique=True)
+    name = models.CharField("Название", max_length=200)
+    color = ColorField(
+        "Цвет", format="hexa",
+        max_length=7,
+        blank=True,
+        null=True
+    )
+    slug = models.SlugField(
+        "Ярлык", unique=True,
+        max_length=200,
+        blank=True,
+        null=True
+    )
 
 
 class Ingredient(models.Model):
     """The model describes the recipe ingredient."""
-    name = models.CharField("Название", max_length=100)
-    measurement_unit = models.CharField("Единицы измерения", max_length=10)
+    name = models.CharField("Название", max_length=200)
+    measurement_unit = models.CharField("Единицы измерения", max_length=200)
