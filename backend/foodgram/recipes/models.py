@@ -25,6 +25,10 @@ class Recipe(models.Model):
     )
     cooking_time = models.TimeField("Время приготовления")
 
+    class Meta:
+        verbose_name = "Рецепт"
+        verbose_name_plural = "Рецепты"
+
 
 class Tag(models.Model):
     """The model describes the tags for fetching by recipes."""
@@ -42,8 +46,16 @@ class Tag(models.Model):
         null=True
     )
 
+    class Meta:
+        verbose_name = "Тег"
+        verbose_name_plural = "Теги"
+
 
 class Ingredient(models.Model):
     """The model describes the recipe ingredient."""
     name = models.CharField("Название", max_length=200)
     measurement_unit = models.CharField("Единицы измерения", max_length=200)
+
+    class Meta:
+        verbose_name = "Ингредиент"
+        verbose_name_plural = "Ингредиенты"
