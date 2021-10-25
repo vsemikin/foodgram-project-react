@@ -88,6 +88,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
         'rest_framework.permissions.AllowAny',
     ],
 
@@ -100,7 +101,16 @@ REST_FRAMEWORK = {
 
 
 DJOSER = {
-    "LOGIN_FIELD": "email"
+    "LOGIN_FIELD": "email",
+    'SERIALIZERS': {
+        'user': 'users.serializers.UserSerializer',
+        'current_user': 'users.serializers.UserSerializer',
+        'user_create': 'users.serializers.UserSerializer',
+    },
+    "HIDE_USERS": False,
+    "PERMISSIONS": {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+    },
 }
 
 

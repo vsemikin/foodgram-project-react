@@ -19,3 +19,6 @@ class User(AbstractUser):
     first_name = models.CharField("Имя", max_length=150)
     last_name = models.CharField("Фамилия", max_length=150)
     is_staff = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["id"]

@@ -10,3 +10,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        serializer.save(user=user)
