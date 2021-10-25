@@ -1,6 +1,7 @@
-from colorfield.fields import ColorField
 from django.conf import settings
 from django.db import models
+from django.core.validators import MinValueValidator
+from django.utils.html import format_html
 
 User = settings.AUTH_USER_MODEL
 
@@ -23,7 +24,12 @@ class Recipe(models.Model):
         "Ingredient", related_name="ingredients",
         verbose_name="Ингридиенты"
     )
-    cooking_time = models.TimeField("Время приготовления")
+    cooking_time = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(limit_value=1, message="Time smaller 1")
+        ],
+        verbose_name="Время приготовления"
+    )
 
     class Meta:
         verbose_name = "Рецепт"
@@ -33,9 +39,8 @@ class Recipe(models.Model):
 class Tag(models.Model):
     """The model describes the tags for fetching by recipes."""
     name = models.CharField("Название", max_length=200)
-    color = ColorField(
-        "Цвет", format="hexa",
-        max_length=7,
+    color = models.CharField(
+        "Цвет", max_length=7,
         blank=True,
         null=True
     )
@@ -46,9 +51,19 @@ class Tag(models.Model):
         null=True
     )
 
+    def colored_name(self):
+        """Color in format HEX."""
+        return format_html(
+            '<span style="color: #{};">{}</span>',
+            self.color,
+        )
+
     class Meta:
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
+
+    def __str__(self):
+        return self.name
 
 
 class Ingredient(models.Model):
@@ -59,3 +74,6 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = "Ингредиент"
         verbose_name_plural = "Ингредиенты"
+
+    def __str__(self):
+        return self.name

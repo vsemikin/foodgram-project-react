@@ -7,7 +7,6 @@ coreschema==0.0.4
 cryptography==35.0.0
 defusedxml==0.7.1
 Django==2.2.6
-django-colorfield==0.4.5
 django-templated-mail==1.1.1
 djangorestframework==3.12.4
 djoser==2.1.0

@@ -7,6 +7,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for the Recipe model."""
     class Meta:
         fields = (
+            "id",
             "ingredients",
             "tags",
             "image",

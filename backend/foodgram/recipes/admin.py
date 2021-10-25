@@ -21,3 +21,4 @@ class IngredientAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     """The class describes tag model in the admin panel."""
     list_display = ("pk", "name")
+    prepopulated_fields = {'slug': ('name',)}
