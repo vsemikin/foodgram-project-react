@@ -1,7 +1,8 @@
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 
-from .models import Ingredient, Recipe, Tag
+from .models import Favorite, Ingredient, Recipe, Tag
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeSerializer, TagSerializer)
 
@@ -36,11 +37,17 @@ class FavoriteViewSet(viewsets.ModelViewSet):
     """Class for adding a recipe to favorites."""
     serializer_class = FavoriteSerializer
 
+    @action(methods=["get"], detail=False, serializer_class=RecipeSerializer)
+    def get_queryset(self):
+        """The function returns all favorite recipes for a given user."""
+        return Favorite.objects.filter(user=self.request.user)
+
     def get_recipe(self):
         """The function returns the recipe by its ID."""
         recipe_id = self.kwargs["recipe_id"]
         return get_object_or_404(Recipe, id=recipe_id)
 
+    @action(methods=["get"], detail=False)
     def perform_create(self, serializer):
         """The function creates an entry in the favorites for the current user and
         the selected recipe."""

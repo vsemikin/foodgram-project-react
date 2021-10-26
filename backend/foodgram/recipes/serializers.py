@@ -28,6 +28,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         model = Recipe
 
+    def create(self, validated_data):
+        """."""
+        ingredients = validated_data["ingredients"]
+        for item in ingredients:
+            Ingredient(name=item)
+        recipe = Recipe(**validated_data)
+        recipe.save()
+        return recipe
+
 
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for the Tag model."""
