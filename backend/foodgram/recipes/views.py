@@ -42,5 +42,6 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         return get_object_or_404(Recipe, id=recipe_id)
 
     def perform_create(self, serializer):
-        """."""
-        serializer.save(author=self.request.user, recipe=self.get_recipe())
+        """The function creates an entry in the favorites for the current user and
+        the selected recipe."""
+        serializer.save(user=self.request.user, recipe=self.get_recipe())

@@ -46,12 +46,13 @@ class IngredientSerializer(serializers.ModelSerializer):
 class FavoriteSerializer(serializers.ModelSerializer):
     """Serializer for the Favorite model."""
     # image = Base64ImageField()
-    recipe = RecipeSerializer(read_only=True)
+    # recipes = RecipeSerializer(read_only=True)
 
     class Meta:
         # fields = ("id", "name", "image", "cooking_time")
-        fields = "recipe"
-        madel = Favorite
+        # fields = ("recipes",)
+        exclude = ("id", "recipe", "user")
+        model = Favorite
         extra_kwargs = {
             'recipe': {'write_only': True},
             'user': {'write_only': True}
