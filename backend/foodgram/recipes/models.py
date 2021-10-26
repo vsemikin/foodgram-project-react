@@ -13,7 +13,7 @@ class Recipe(models.Model):
         related_name="recipes",
         verbose_name="Автор публикации"
     )
-    name = models.CharField("Название", max_length=100)
+    name = models.CharField("Название", max_length=200)
     image = models.ImageField("Картинка", upload_to="recipes/")
     text = models.TextField("Текстовое описание")
     tags = models.ManyToManyField(
@@ -77,3 +77,26 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Favorite(models.Model):
+    """The model describes the user's favorites section."""
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE,
+        related_name="favorites_recipe",
+        verbose_name=" Рецепт"
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name="favorites_user",
+        verbose_name="Автор публикации"
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["recipe", "user"],
+                name="unique_pair"
+            ),
+        ]
+        verbose_name = "Избранное"
