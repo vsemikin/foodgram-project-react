@@ -1,8 +1,10 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from users.serializers import UserSerializer
 
-from .models import Favorite, Ingredient, Recipe, Tag
+from .models import Favorite, Follow, Ingredient, Recipe, Tag
+# from users.models import User
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -28,14 +30,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         model = Recipe
 
-    def create(self, validated_data):
-        """."""
-        ingredients = validated_data["ingredients"]
-        for item in ingredients:
-            Ingredient(name=item)
-        recipe = Recipe(**validated_data)
-        recipe.save()
-        return recipe
+    # def create(self, validated_data):
+    #     """."""
+    #     ingredients = self.context["request"].data["ingredients"]
+    #     for item in ingredients:
+    #         Ingredient.objects.create(name=item)
+    #     recipe = Recipe.objects.create(**validated_data)
+    #     recipe.save()
+    #     return recipe
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -66,3 +68,27 @@ class FavoriteSerializer(serializers.ModelSerializer):
             'recipe': {'write_only': True},
             'user': {'write_only': True}
         }
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    """Serializer for the Follow model."""
+    email = serializers.EmailField(source="user.email", read_only=True)
+
+    class Meta:
+        exclude = ("user", "following")
+        model = Follow
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=("user", "following"),
+                message="The subscriber:blogger combination must be unique!"
+            )
+        ]
+
+    def validate(self, data):
+        """The function prohibits subscribing to yourself."""
+        if data["following"] == self.context["request"].user:
+            raise serializers.ValidationError(
+                "It is impossible to subscribe to yourself"
+            )
+        return data
