@@ -14,6 +14,11 @@ router.register(
     basename="Favorite"
 )
 router.register(
+    "users/subscriptions",
+    FollowViewSet,
+    basename="Follows"
+)
+router.register(
     r"users/(?P<user_id>\d+)/subscribe",
     FollowViewSet,
     basename="Follow"

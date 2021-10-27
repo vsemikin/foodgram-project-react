@@ -1,10 +1,10 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
+# from rest_framework.validators import UniqueTogetherValidator
 from users.serializers import UserSerializer
 
 from .models import Favorite, Follow, Ingredient, Recipe, Tag
-# from users.models import User
+from users.models import User
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -72,23 +72,30 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(serializers.ModelSerializer):
     """Serializer for the Follow model."""
-    email = serializers.EmailField(source="user.email", read_only=True)
+    # email = serializers.EmailField(source="user.email", read_only=True)
+    user = serializers.CharField(
+        read_only=True, default=serializers.CurrentUserDefault()
+    )
+    following = serializers.SlugRelatedField(
+        slug_field="username",
+        queryset=User.objects.all()
+    )
 
     class Meta:
-        exclude = ("user", "following")
+        fields = ("user", "following")
         model = Follow
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=("user", "following"),
-                message="The subscriber:blogger combination must be unique!"
-            )
-        ]
+        # validators = [
+        #     UniqueTogetherValidator(
+        #         queryset=Follow.objects.all(),
+        #         fields=("user", "following"),
+        #         message="The subscriber:blogger combination must be unique!"
+        #     )
+        # ]
 
-    def validate(self, data):
-        """The function prohibits subscribing to yourself."""
-        if data["following"] == self.context["request"].user:
-            raise serializers.ValidationError(
-                "It is impossible to subscribe to yourself"
-            )
-        return data
+    # def validate(self, data):
+    #     """The function prohibits subscribing to yourself."""
+    #     if data["following"] == self.context["request"].user:
+    #         raise serializers.ValidationError(
+    #             "It is impossible to subscribe to yourself"
+    #         )
+    #     return data

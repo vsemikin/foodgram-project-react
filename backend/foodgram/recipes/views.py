@@ -74,12 +74,12 @@ class FollowViewSet(viewsets.ModelViewSet):
     creates a subscription."""
     serializer_class = FollowSerializer
     # filter_backends = (filters.SearchFilter,)
-    search_fields = ("=user__username", "=following__username")
+    # search_fields = ("=user__username", "=following__username")
 
-    # def get_queryset(self):
-    #     """The function returns a queryset containing all subscribers
-    #     of the current user."""
-    #     return self.request.user.following.all()
+    def get_queryset(self):
+        """The function returns a queryset containing all subscribers
+        of the current user."""
+        return self.request.user.following.all()
 
     def get_user(self):
         """The function returns the recipe by its ID."""
@@ -89,4 +89,4 @@ class FollowViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """The function passes the current user as a subscriber to the
         specified blogger."""
-        serializer.save(user=self.request.user)
+        serializer.save(user=self.request.user, following=self.get_user())
