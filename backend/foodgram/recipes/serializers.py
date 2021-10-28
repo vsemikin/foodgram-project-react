@@ -7,20 +7,34 @@ from .models import Favorite, Follow, Ingredient, Recipe, Tag
 from users.models import User
 
 
+class IngredientSerializer(serializers.ModelSerializer):
+    """Serializer for the Ingredient model."""
+    class Meta:
+        fields = ("id", "name", "measurement_unit")
+        model = Ingredient
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for the Recipe model."""
     image = Base64ImageField()
     author = UserSerializer(read_only=True)
-    ingredients = serializers.SlugRelatedField(
-        queryset=Ingredient.objects.all(),
-        slug_field="name",
-        many=True
-    )
+    # ingredients = serializers.SlugRelatedField(
+    #     # queryset=Ingredient.objects.all(),
+    #     slug_field="ingredients.name",
+    #     read_only=True,
+    #     many=True
+    # )
+    # ingredients = serializers.CharField(
+    #     source="ingredients.name",
+    #     read_only=True
+    # )
+    # ingredients = IngredientSerializer(many=True)
+    ingredients = serializers.SerializerMethodField()
 
     class Meta:
         fields = (
             "id",
-            "tags",
+            # "tags",
             "author",
             "ingredients",
             "image",
@@ -30,14 +44,29 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         model = Recipe
 
+    def get_ingredients(self, instance):
+        """."""
+        ingredients_list = []
+        for item in instance.ingredients.get_queryset():
+            ingredients_list.append(item.name)
+        return ingredients_list
+
     # def create(self, validated_data):
     #     """."""
-    #     ingredients = self.context["request"].data["ingredients"]
-    #     for item in ingredients:
-    #         Ingredient.objects.create(name=item)
+    #     # ingredients = self.context["request"].data["ingredients"]
+    #     # for ingredient in ingredients:
+    #     #     Ingredient.objects.create(name=ingredient)
+    #     # # tags = self.context["request"].data["tags"]
+    #     # # for tag in tags:
+    #     # #     Tag.objects.get(id=tag)
     #     recipe = Recipe.objects.create(**validated_data)
     #     recipe.save()
     #     return recipe
+    #     # ingredients_serializer = IngredientSerializer(
+    #     #     validated_data.get('ingredients')
+    #     # )
+    #     # ingredients_serializer.save
+    #     # return Recipe.objects.create(**validated_data)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -45,13 +74,6 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ("id", "name", "color", "slug")
         model = Tag
-
-
-class IngredientSerializer(serializers.ModelSerializer):
-    """Serializer for the Ingredient model."""
-    class Meta:
-        fields = ("id", "name", "measurement_unit")
-        model = Ingredient
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
