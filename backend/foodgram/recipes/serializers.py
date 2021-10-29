@@ -3,7 +3,7 @@ from rest_framework import serializers
 # from rest_framework.validators import UniqueTogetherValidator
 from users.serializers import UserSerializer
 
-from .models import Favorite, Follow, Ingredient, Recipe, Tag
+from .models import Favorite, Follow, Ingredient, IngredientAmount, Recipe, Tag
 from users.models import User
 
 
@@ -14,22 +14,45 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
 
 
+# class IngredientAmountListSerializer(serializers.ListSerializer):
+#     """."""
+#     def create(self, validated_data):
+#         ingredients = [IngredientAmount(**item) for item in validated_data]
+#         return IngredientAmount.objects.bulk_create(ingredients)
+
+
+class IngredientAmountSerializer(serializers.ModelSerializer):
+    """Serializer for the IngredientAmount model."""
+    # name = serializers.CharField(
+    #     source="ingredient.name",
+    #     read_only=True,
+    #     # many=True
+    # )
+    # measurement_unit = serializers.CharField(
+    #     source="ingredient.measurement_unit",
+    #     read_only=True,
+    #     # many=True
+    # )
+
+    class Meta:
+        # fields = ("id", "name", "measurement_unit", "amount")
+        fields = ("id", "amount")
+        model = IngredientAmount
+        # list_serializer_class = IngredientAmountListSerializer
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """Serializer for the Tag model."""
+    class Meta:
+        fields = ("id", "name", "color", "slug")
+        model = Tag
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for the Recipe model."""
     image = Base64ImageField()
     author = UserSerializer(read_only=True)
-    # ingredients = serializers.SlugRelatedField(
-    #     # queryset=Ingredient.objects.all(),
-    #     slug_field="ingredients.name",
-    #     read_only=True,
-    #     many=True
-    # )
-    # ingredients = serializers.CharField(
-    #     source="ingredients.name",
-    #     read_only=True
-    # )
-    # ingredients = IngredientSerializer(many=True)
-    ingredients = serializers.SerializerMethodField()
+    ingredients = IngredientAmountSerializer(many=True)
 
     class Meta:
         fields = (
@@ -44,36 +67,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         model = Recipe
 
-    def get_ingredients(self, instance):
-        """."""
-        ingredients_list = []
-        for item in instance.ingredients.get_queryset():
-            ingredients_list.append(item.name)
-        return ingredients_list
-
-    # def create(self, validated_data):
-    #     """."""
-    #     # ingredients = self.context["request"].data["ingredients"]
-    #     # for ingredient in ingredients:
-    #     #     Ingredient.objects.create(name=ingredient)
-    #     # # tags = self.context["request"].data["tags"]
-    #     # # for tag in tags:
-    #     # #     Tag.objects.get(id=tag)
-    #     recipe = Recipe.objects.create(**validated_data)
-    #     recipe.save()
-    #     return recipe
-    #     # ingredients_serializer = IngredientSerializer(
-    #     #     validated_data.get('ingredients')
-    #     # )
-    #     # ingredients_serializer.save
-    #     # return Recipe.objects.create(**validated_data)
-
-
-class TagSerializer(serializers.ModelSerializer):
-    """Serializer for the Tag model."""
-    class Meta:
-        fields = ("id", "name", "color", "slug")
-        model = Tag
+    def create(self, validated_data):
+        recipe = validated_data.pop("ingredients")
+        ingredients = [
+            Recipe.objects.create(ingredients=IngredientAmount(**item) for item in validated_data.pop("ingredients"))
+        ]
+        # IngredientAmount.objects.bulk_create(ingredients)
+        return ingredients
+        
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

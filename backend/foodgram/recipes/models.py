@@ -13,7 +13,7 @@ class Recipe(models.Model):
         related_name="recipes",
         verbose_name="Автор публикации"
     )
-    name = models.CharField("Название", max_length=200)
+    name = models.CharField("Название", max_length=200, unique=True)
     image = models.ImageField("Картинка", upload_to="recipes/")
     text = models.TextField("Текстовое описание")
     tags = models.ManyToManyField(
@@ -21,7 +21,8 @@ class Recipe(models.Model):
         verbose_name="Теги"
     )
     ingredients = models.ManyToManyField(
-        "Ingredient", related_name="ingredients",
+        "Ingredient", through="IngredientAmount",
+        related_name="ingredients",
         verbose_name="Ингридиенты"
     )
     cooking_time = models.PositiveSmallIntegerField(
@@ -81,6 +82,30 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class IngredientAmount(models.Model):
+    """Model for describing the amount of ingredients."""
+    ingredient = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE,
+        related_name="ingredients_amount",
+        verbose_name="Ингредиент"
+    )
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE,
+        related_name="recipes_amount",
+        verbose_name="Рецепт"
+    )
+    amount = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(limit_value=1, message="Amount smaller 1")
+        ],
+        verbose_name="Количество"
+    )
+
+    class Meta:
+        verbose_name = "Количество ингредиента"
+        verbose_name_plural = "Количества ингредиентов"
 
 
 class Favorite(models.Model):
