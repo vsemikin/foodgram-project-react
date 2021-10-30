@@ -14,13 +14,6 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
 
 
-# class IngredientAmountListSerializer(serializers.ListSerializer):
-#     """."""
-#     def create(self, validated_data):
-#         ingredients = [IngredientAmount(**item) for item in validated_data]
-#         return IngredientAmount.objects.bulk_create(ingredients)
-
-
 class IngredientAmountSerializer(serializers.ModelSerializer):
     """Serializer for the IngredientAmount model."""
     # name = serializers.CharField(
@@ -33,12 +26,12 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
     #     read_only=True,
     #     # many=True
     # )
+    id = serializers.IntegerField()
 
     class Meta:
         # fields = ("id", "name", "measurement_unit", "amount")
         fields = ("id", "amount")
         model = IngredientAmount
-        # list_serializer_class = IngredientAmountListSerializer
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -68,13 +61,17 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
 
     def create(self, validated_data):
-        recipe = validated_data.pop("ingredients")
-        ingredients = [
-            Recipe.objects.create(ingredients=IngredientAmount(**item) for item in validated_data.pop("ingredients"))
-        ]
-        # IngredientAmount.objects.bulk_create(ingredients)
-        return ingredients
-        
+        """."""
+        ingredients = validated_data.pop("ingredients")
+        recipe = Recipe.objects.create(**validated_data)
+        for item in ingredients:
+            current_ingredient = Ingredient(id=item["id"])
+            IngredientAmount.objects.create(
+                ingredient=current_ingredient,
+                recipe=recipe,
+                amount=item["amount"]
+            )
+        return recipe
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
