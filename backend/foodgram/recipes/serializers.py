@@ -26,7 +26,8 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
     #     read_only=True,
     #     # many=True
     # )
-    id = serializers.IntegerField()
+    id = IngredientSerializer()
+    # amount = serializers.IntegerField()
 
     class Meta:
         # fields = ("id", "name", "measurement_unit", "amount")
@@ -45,7 +46,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for the Recipe model."""
     image = Base64ImageField()
     author = UserSerializer(read_only=True)
-    ingredients = IngredientAmountSerializer(many=True)
+    ingredients = IngredientAmountSerializer(
+        source="ingredientamount",
+        many=True
+    )
 
     class Meta:
         fields = (
@@ -62,10 +66,10 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """."""
-        ingredients = validated_data.pop("ingredients")
+        ingredients = validated_data.pop("ingredientamount")
         recipe = Recipe.objects.create(**validated_data)
         for item in ingredients:
-            current_ingredient = Ingredient(id=item["id"])
+            current_ingredient = Ingredient(id=item["ingredient"]["id"])
             IngredientAmount.objects.create(
                 ingredient=current_ingredient,
                 recipe=recipe,
