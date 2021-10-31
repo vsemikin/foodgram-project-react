@@ -9,8 +9,10 @@ from users.models import User
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Serializer for the Ingredient model."""
+    amount = serializers.IntegerField(source="ingredientamount.amount")
+
     class Meta:
-        fields = ("id", "name", "measurement_unit")
+        fields = ("id", "name", "measurement_unit", "amount")
         model = Ingredient
 
 
@@ -26,8 +28,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
     #     read_only=True,
     #     # many=True
     # )
-    id = IngredientSerializer()
-    # amount = serializers.IntegerField()
+    id = serializers.IntegerField()
 
     class Meta:
         # fields = ("id", "name", "measurement_unit", "amount")
@@ -46,10 +47,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for the Recipe model."""
     image = Base64ImageField()
     author = UserSerializer(read_only=True)
-    ingredients = IngredientAmountSerializer(
-        source="ingredientamount",
-        many=True
-    )
+    ingredients = IngredientAmountSerializer(many=True)
 
     class Meta:
         fields = (
@@ -66,10 +64,10 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """."""
-        ingredients = validated_data.pop("ingredientamount")
+        ingredients = validated_data.pop("ingredients")
         recipe = Recipe.objects.create(**validated_data)
         for item in ingredients:
-            current_ingredient = Ingredient(id=item["ingredient"]["id"])
+            current_ingredient = Ingredient(id=item["id"])
             IngredientAmount.objects.create(
                 ingredient=current_ingredient,
                 recipe=recipe,
