@@ -9,7 +9,7 @@ from users.models import User
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Serializer for the Ingredient model."""
-    amount = serializers.IntegerField(source="ingredientamount.amount")
+    amount = serializers.IntegerField(source="ingredientamount.ingredient")
 
     class Meta:
         fields = ("id", "name", "measurement_unit", "amount")
@@ -18,21 +18,14 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
     """Serializer for the IngredientAmount model."""
-    # name = serializers.CharField(
-    #     source="ingredient.name",
-    #     read_only=True,
-    #     # many=True
-    # )
-    # measurement_unit = serializers.CharField(
-    #     source="ingredient.measurement_unit",
-    #     read_only=True,
-    #     # many=True
-    # )
+    name = serializers.ReadOnlyField(source="ingredient.name")
+    measurement_unit = serializers.ReadOnlyField(
+        source="ingredient.measurement_unit"
+    )
     id = serializers.IntegerField()
 
     class Meta:
-        # fields = ("id", "name", "measurement_unit", "amount")
-        fields = ("id", "amount")
+        fields = ("id", "name", "measurement_unit", "amount")
         model = IngredientAmount
 
 
