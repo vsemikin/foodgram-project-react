@@ -21,7 +21,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
     measurement_unit = serializers.ReadOnlyField(
         source="ingredient.measurement_unit"
     )
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(source="ingredient.id")
 
     class Meta:
         fields = ("id", "name", "measurement_unit", "amount")
@@ -69,7 +69,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
         for item in ingredients:
-            current_ingredient = Ingredient(id=item["id"])
+            current_ingredient = Ingredient(id=item["ingredient"]["id"])
             IngredientAmount.objects.create(
                 ingredient=current_ingredient,
                 recipe=recipe,
