@@ -30,6 +30,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for the Tag model."""
+
     class Meta:
         fields = ("id", "name", "color", "slug")
         model = Tag
@@ -43,24 +44,30 @@ class RecipeSerializer(serializers.ModelSerializer):
         source="recipes_amount",
         many=True
     )
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True
+    )
 
     class Meta:
         fields = (
             "id",
-            # "tags",
+            "tags",
             "author",
             "ingredients",
-            "image",
             "name",
+            "image",
             "text",
             "cooking_time"
         )
         model = Recipe
 
     def create(self, validated_data):
-        """."""
+        """Recipe creation."""
         ingredients = validated_data.pop("recipes_amount")
+        tags = validated_data.pop("tags")
         recipe = Recipe.objects.create(**validated_data)
+        recipe.tags.set(tags)
         for item in ingredients:
             current_ingredient = Ingredient(id=item["id"])
             IngredientAmount.objects.create(

@@ -39,17 +39,13 @@ class Recipe(models.Model):
 
 class Tag(models.Model):
     """The model describes the tags for fetching by recipes."""
-    name = models.CharField("Название", max_length=200)
+    name = models.CharField("Название", max_length=200, unique=True)
     color = models.CharField(
-        "Цвет", max_length=7,
-        blank=True,
-        null=True
+        "Цвет", max_length=7
     )
     slug = models.SlugField(
         "Ярлык", unique=True,
-        max_length=200,
-        blank=True,
-        null=True
+        max_length=200
     )
 
     def colored_name(self):
@@ -63,8 +59,8 @@ class Tag(models.Model):
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
 
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+    #     return self.name
 
 
 class Ingredient(models.Model):
