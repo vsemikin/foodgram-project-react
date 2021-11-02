@@ -24,6 +24,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         published from his profile."""
         serializer.save(author=self.request.user)
 
+    def perform_update(self, serializer):
+        """."""
+        serializer.save(author=self.request.user)
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """The class returns all or one tag."""

@@ -1,10 +1,10 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from users.models import User
 # from rest_framework.validators import UniqueTogetherValidator
 from users.serializers import UserSerializer
 
 from .models import Favorite, Follow, Ingredient, IngredientAmount, Recipe, Tag
-from users.models import User
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -62,13 +62,18 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         model = Recipe
 
+    def to_representation(self, obj):
+        """."""
+        self.fields['tags'] = TagSerializer(many=True)
+        return super(RecipeSerializer, self).to_representation(obj)
+
     def create(self, validated_data):
         """Recipe creation."""
-        ingredients = validated_data.pop("recipes_amount")
-        tags = validated_data.pop("tags")
+        ingredients_data = validated_data.pop("recipes_amount")
+        tags_data = validated_data.pop("tags")
         recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags)
-        for item in ingredients:
+        recipe.tags.set(tags_data)
+        for item in ingredients_data:
             current_ingredient = Ingredient(id=item["ingredient"]["id"])
             IngredientAmount.objects.create(
                 ingredient=current_ingredient,
@@ -76,6 +81,18 @@ class RecipeSerializer(serializers.ModelSerializer):
                 amount=item["amount"]
             )
         return recipe
+
+    def update(self, instance, validated_data):
+        """."""
+        instance.name = validated_data.get('name', instance.name)
+        instance.image = validated_data.get('image', instance.image)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time',
+            instance.cooking_time
+        )
+        instance.save()
+        return instance
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
