@@ -84,15 +84,24 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """."""
-        instance.name = validated_data.get('name', instance.name)
-        instance.image = validated_data.get('image', instance.image)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time',
-            instance.cooking_time
-        )
-        instance.save()
-        return instance
+        # ingredients_data = validated_data.pop("recipes_amount")
+        # tags_data = validated_data.pop("tags")
+        # instance.name = validated_data.get('name', instance.name)
+        # instance.image = validated_data.get('image', instance.image)
+        # instance.text = validated_data.get('text', instance.text)
+        # instance.cooking_time = validated_data.get(
+        #     'cooking_time',
+        #     instance.cooking_time
+        # )
+        # instance.tags.clear()
+        # instance.tags.set(tags_data)
+        # instance.save()
+        # return instance
+        ingredients_serializer = self.fields["id"]
+        ingredients_instance = instance.ingredients
+        ingredients_data = validated_data.pop("recipes_amount")
+        ingredients_serializer.update(ingredients_instance, ingredients_data)
+        return super(RecipeSerializer, self).update(instance, validated_data)
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
