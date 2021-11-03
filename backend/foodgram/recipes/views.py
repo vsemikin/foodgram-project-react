@@ -4,7 +4,7 @@ from rest_framework import viewsets
 # from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 
-from .filters import IngredientFilter
+from .filters import IngredientFilter, RecipeFilter
 from .models import Ingredient, Recipe, Tag
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, RecipeSerializer,
@@ -18,6 +18,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     modifies a port."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def perform_create(self, serializer):
         """The function passes the current user as the author of the recipe

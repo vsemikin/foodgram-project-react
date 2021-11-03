@@ -1,6 +1,6 @@
 from django_filters import filters, FilterSet
 
-from .models import Ingredient
+from .models import Ingredient, Recipe
 
 
 class IngredientFilter(FilterSet):
@@ -12,4 +12,20 @@ class IngredientFilter(FilterSet):
 
     class Meta:
         model = Ingredient
-        fields = ("name",)
+        fields = ["name"]
+
+
+class RecipeFilter(FilterSet):
+    """Model Filter Ingredient."""
+    author = filters.CharFilter(
+        field_name="author__id",
+        lookup_expr="exact"
+    )
+    tags = filters.AllValuesMultipleFilter(
+        field_name="tags__slug",
+        lookup_expr="iexact",
+    )
+
+    class Meta:
+        model = Recipe
+        fields = ["author", "tags"]
