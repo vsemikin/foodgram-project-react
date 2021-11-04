@@ -104,6 +104,29 @@ class IngredientAmount(models.Model):
         verbose_name_plural = "Количества ингредиентов"
 
 
+class ShoppingCart(models.Model):
+    """The model describes the user's shopping list."""
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE,
+        related_name="carts",
+        verbose_name=" Рецепт"
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name="carts_user",
+        verbose_name="Пользователь"
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["recipe", "user"],
+                name="unique_pair"
+            ),
+        ]
+        verbose_name = "Список покупок"
+
+
 class Favorite(models.Model):
     """The model describes the user's favorites section."""
     recipe = models.ForeignKey(

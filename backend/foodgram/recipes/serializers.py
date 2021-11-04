@@ -4,7 +4,8 @@ from users.models import User
 # from rest_framework.validators import UniqueTogetherValidator
 from users.serializers import UserSerializer
 
-from .models import Favorite, Follow, Ingredient, IngredientAmount, Recipe, Tag
+from .models import (Favorite, Follow, Ingredient, IngredientAmount, Recipe,
+                     ShoppingCart, Tag)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -107,6 +108,18 @@ class RecipeSerializer(serializers.ModelSerializer):
                 amount=item["amount"]
             )
         return instance
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    """Serializer for the ShoppingCart model."""
+    id = serializers.ReadOnlyField(source="recipe.id")
+    name = serializers.ReadOnlyField(source="recipe.name")
+    image = Base64ImageField(source="recipe.image", read_only=True)
+    cooking_time = serializers.ReadOnlyField(source="recipe.cooking_time")
+
+    class Meta:
+        fields = ("id", "name", "image", "cooking_time")
+        model = ShoppingCart
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

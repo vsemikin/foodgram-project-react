@@ -1,14 +1,15 @@
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
-# from rest_framework.decorators import action
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
-from .models import Ingredient, Recipe, Tag
+from .models import Ingredient, Recipe, ShoppingCart, Tag
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, RecipeSerializer,
-                          TagSerializer)
+                          ShoppingCartSerializer, TagSerializer)
 
 User = settings.AUTH_USER_MODEL
 
@@ -20,6 +21,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+    http_method_names = [
+        "get",
+        "post",
+        "put",
+        "delete",
+    ]
 
     def perform_create(self, serializer):
         """The function passes the current user as the author of the recipe
@@ -27,8 +34,32 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
-        """."""
+        """The function passes the current user as the author of the recipe
+        updated from his profile."""
         serializer.save(author=self.request.user)
+
+    @action(
+        detail=True,
+        methods=["get", "delete"],
+        url_path="shopping_cart"
+    )
+    def shopping_cart(self, request, pk=None):
+        """Function to add or remove a recipe in the shopping list."""
+        recipe = self.get_object()
+        if request.method == "GET":
+            instance = ShoppingCart.objects.create(
+                recipe=recipe,
+                user=request.user
+            )
+            serializer = ShoppingCartSerializer(instance)
+            return Response(serializer.data)
+        else:
+            instance = ShoppingCart.objects.filter(
+                recipe=recipe,
+                user=request.user
+            )
+            instance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -36,6 +67,7 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
+    http_method_names = ["get"]
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -45,6 +77,19 @@ class IngredientViewSet(viewsets.ModelViewSet):
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
     filterset_class = IngredientFilter
+    http_method_names = ["get"]
+
+
+class ShoppingCartViewSet(viewsets.ModelViewSet):
+    """."""
+    serializer_class = ShoppingCartSerializer
+    pagination_class = None
+    http_method_names = ["get"]
+
+    def get_queryset(self):
+        """The function returns a set of queries containing all recipes
+        from the shopping list current user."""
+        return self.request.user.carts_user.all()
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):
