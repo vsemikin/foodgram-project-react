@@ -49,6 +49,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True
     )
+    is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         fields = (
@@ -56,6 +57,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             "tags",
             "author",
             "ingredients",
+            "is_in_shopping_cart",
             "name",
             "image",
             "text",
@@ -67,6 +69,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         """."""
         self.fields['tags'] = TagSerializer(many=True)
         return super(RecipeSerializer, self).to_representation(obj)
+
+    def get_is_in_shopping_cart(self, obj):
+        """."""
+        request = self.context.get("request")
+        if ShoppingCart.objects.filter(recipe=obj, user=request.user).exists():
+            return True
+        return False
 
     def create(self, validated_data):
         """Recipe creation."""

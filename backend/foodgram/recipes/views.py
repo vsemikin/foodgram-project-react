@@ -1,6 +1,8 @@
+import json
 from django.conf import settings
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets
+from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -80,16 +82,22 @@ class IngredientViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
 
-class ShoppingCartViewSet(viewsets.ModelViewSet):
+class ShoppingCartViewSet(views.APIView):
     """."""
-    serializer_class = ShoppingCartSerializer
-    pagination_class = None
-    http_method_names = ["get"]
+    # serializer_class = ShoppingCartSerializer
+    # pagination_class = None
+    # http_method_names = ["get"]
 
-    def get_queryset(self):
-        """The function returns a set of queries containing all recipes
-        from the shopping list current user."""
-        return self.request.user.carts_user.all()
+    # def get_queryset(self):
+    #     """The function returns a set of queries containing all recipes
+    #     from the shopping list current user."""
+    #     return self.request.user.carts_user.all()
+
+    def get(self, request):
+        queryset = request.user.carts_user.all()
+        serializer = ShoppingCartSerializer(queryset, many=True)
+        # data = json.load(serializer.data)
+        return HttpResponse(serializer.data, content_type="plain/text")
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):

@@ -25,7 +25,18 @@ class RecipeFilter(FilterSet):
         field_name="tags__slug",
         lookup_expr="iexact",
     )
+    # is_in_shopping_cart = filters.BooleanFilter(
+    #     method='filter_is_in_shopping_cart',
+    #     lookup_expr="exact"
+    # )
 
     class Meta:
         model = Recipe
-        fields = ["author", "tags"]
+        fields = [
+            "author",
+            "tags",
+            # "is_in_shopping_cart",
+        ]
+
+    # def filter_is_in_shopping_cart(self, queryset, name, value):
+    #     return queryset.filter(**{"is_in_shopping_cart": False})
