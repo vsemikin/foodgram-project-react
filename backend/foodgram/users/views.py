@@ -1,6 +1,5 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from .models import Follow, User
@@ -51,18 +50,9 @@ class FollowViewSet(viewsets.ModelViewSet):
     """The class returns a list of all subscribers and
     creates a subscription."""
     serializer_class = FollowSerializer
+    http_method_names = ["get"]
 
     def get_queryset(self):
         """The function returns a queryset containing all subscribers
         of the current user."""
-        return self.request.user.following.all()
-
-    def get_user(self):
-        """The function returns the recipe by its ID."""
-        user_id = self.kwargs["user_id"]
-        return get_object_or_404(User, id=user_id)
-
-    def perform_create(self, serializer):
-        """The function passes the current user as a subscriber to the
-        specified blogger."""
-        serializer.save(user=self.request.user, following=self.get_user())
+        return self.request.user.follower.all()

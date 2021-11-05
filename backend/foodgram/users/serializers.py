@@ -48,6 +48,7 @@ class FollowSerializer(serializers.ModelSerializer):
     last_name = serializers.ReadOnlyField(source="following.last_name")
     is_subscribed = serializers.SerializerMethodField(read_only=True)
     recipes = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         fields = (
@@ -58,11 +59,12 @@ class FollowSerializer(serializers.ModelSerializer):
             "last_name",
             "is_subscribed",
             "recipes",
+            "recipes_count",
         )
         model = Follow
 
     def get_is_subscribed(self, obj):
-        """."""
+        """The function returns the subscription status."""
         if Follow.objects.filter(
             following=obj.following, user=obj.user
         ).exists():
@@ -70,10 +72,16 @@ class FollowSerializer(serializers.ModelSerializer):
         return False
 
     def get_recipes(self, obj):
-        """."""
+        """The function returns all the recipes of the blogger
+        subscribed to."""
         queryset = Recipe.objects.filter(author__following__user=obj.user)
         serializer = RecipeFollowSerializer(queryset, many=True)
         return serializer.data
+
+    def get_recipes_count(self, obj):
+        """The function returns the number of recipes of the blogger
+        subscribed to."""
+        return Recipe.objects.filter(author__following__user=obj.user).count()
 
     def validate(self, data):
         """The function prohibits subscribing to yourself."""
