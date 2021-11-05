@@ -1,6 +1,8 @@
+from drf_extra_fields.fields import Base64ImageField
+from recipes.models import Recipe
 from rest_framework import serializers
 
-from .models import User
+from .models import Follow, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,3 +26,59 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data["password"])
         user.save()
         return user
+
+
+class RecipeFollowSerializer(serializers.ModelSerializer):
+    """Serializer for recipes in follow serializer."""
+    name = serializers.ReadOnlyField()
+    image = Base64ImageField(read_only=True)
+    cooking_time = serializers.ReadOnlyField()
+
+    class Meta:
+        fields = ("id", "name", "image", "cooking_time")
+        model = Recipe
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    """Serializer for the Follow model."""
+    email = serializers.ReadOnlyField(source="following.email")
+    id = serializers.ReadOnlyField(source="following.id")
+    username = serializers.ReadOnlyField(source="following.username")
+    first_name = serializers.ReadOnlyField(source="following.first_name")
+    last_name = serializers.ReadOnlyField(source="following.last_name")
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+    recipes = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        fields = (
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "is_subscribed",
+            "recipes",
+        )
+        model = Follow
+
+    def get_is_subscribed(self, obj):
+        """."""
+        if Follow.objects.filter(
+            following=obj.following, user=obj.user
+        ).exists():
+            return True
+        return False
+
+    def get_recipes(self, obj):
+        """."""
+        queryset = Recipe.objects.filter(author__following__user=obj.user)
+        serializer = RecipeFollowSerializer(queryset, many=True)
+        return serializer.data
+
+    def validate(self, data):
+        """The function prohibits subscribing to yourself."""
+        if data["following"] == self.context["request"].user:
+            raise serializers.ValidationError(
+                "It is impossible to subscribe to yourself"
+            )
+        return data

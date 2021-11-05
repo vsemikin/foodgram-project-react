@@ -148,31 +148,3 @@ class Favorite(models.Model):
             ),
         ]
         verbose_name = "Избранное"
-
-
-class Follow(models.Model):
-    """Subscription model for recipe author publications."""
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE,
-        related_name="follower",
-        verbose_name="Подписчик"
-    )
-    following = models.ForeignKey(
-        User, on_delete=models.CASCADE,
-        related_name="following",
-        verbose_name="Блогер"
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["user", "following"],
-                name="unique_pair"
-            ),
-            models.CheckConstraint(
-                check=~models.Q(user=models.F("following")),
-                name="impossible_subscribe_yourself"
-            )
-        ]
-        verbose_name = "Подписка"
-        verbose_name_plural = "Подписки"
