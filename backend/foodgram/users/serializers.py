@@ -7,6 +7,8 @@ from .models import Follow, User
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the User model."""
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -15,10 +17,14 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
             "first_name",
             "last_name",
-            "password"
-            # "is_subscribed"
+            "password",
+            "is_subscribed"
         )
         extra_kwargs = {'password': {'write_only': True}}
+
+    def get_is_subscribed(self, obj):
+        """The function returns the subscription status."""
+        return False
 
     def create(self, validated_data):
         """Function for hashing the user's password."""

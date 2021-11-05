@@ -88,8 +88,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -108,7 +107,8 @@ DJOSER = {
     # },
     # "HIDE_USERS": False,
     "PERMISSIONS": {
-        'user': ['rest_framework.permissions.IsAuthenticated'],
+        'token_create': ['rest_framework.permissions.IsAuthenticated'],
+        'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
     },
 }
 

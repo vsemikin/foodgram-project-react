@@ -1,12 +1,15 @@
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
 from .models import Ingredient, Favorite, Recipe, ShoppingCart, Tag
+from .permissions import IsOwnerOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
                           TagSerializer)
@@ -19,6 +22,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     modifies a port."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     http_method_names = [
@@ -41,7 +45,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=["get", "delete"],
-        url_path="shopping_cart"
+        permission_classes=(IsAuthenticated,),
+        url_path="shopping_cart",
     )
     def shopping_cart(self, request, pk=None):
         """Function to add or remove a recipe in the shopping list."""
@@ -64,7 +69,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=["get", "delete"],
-        url_path="favorite"
+        url_path="favorite",
     )
     def favorite(self, request, pk=None):
         """Function to add or remove a recipe in the favorite list."""
@@ -117,5 +122,4 @@ class ShoppingCartViewSet(views.APIView):
     def get(self, request):
         queryset = request.user.carts_user.all()
         serializer = ShoppingCartSerializer(queryset, many=True)
-        # data = json.load(serializer.data)
-        return HttpResponse(serializer.data, content_type="plain/text")
+        return FileResponse(serializer.data, content_type="plain/text")
