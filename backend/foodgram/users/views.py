@@ -21,8 +21,8 @@ class UserViewSet(viewsets.ModelViewSet):
         url_path="me",
     )
     def me(self, request):
-        """."""
-        serializer = UserSerializer(self.request.user)
+        """The function returns information about the current user."""
+        serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
     @action(

@@ -66,23 +66,30 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
 
     def to_representation(self, obj):
-        """."""
+        """The function converts tag id to tag serializer representation."""
         self.fields['tags'] = TagSerializer(many=True)
         return super().to_representation(obj)
 
     def get_is_in_shopping_cart(self, obj):
-        """."""
+        """The function returns the status of the recipe
+        in the shopping list."""
         request = self.context.get("request")
-        if ShoppingCart.objects.filter(recipe=obj, user=request.user).exists():
-            return True
-        return False
+        if request is None or request.user.is_anonymous:
+            return False
+        queryset = ShoppingCart.objects.filter(
+            recipe=obj, user=request.user
+        ).exists()
+        return queryset
 
     def get_is_favorited(self, obj):
-        """."""
+        """The function returns the status of the recipe in the favorites."""
         request = self.context.get("request")
-        if Favorite.objects.filter(recipe=obj, user=request.user).exists():
-            return True
-        return False
+        if request is None or request.user.is_anonymous:
+            return False
+        queryset = Favorite.objects.filter(
+            recipe=obj, user=request.user
+        ).exists()
+        return queryset
 
     def create(self, validated_data):
         """Recipe creation."""

@@ -1,7 +1,7 @@
 from django.conf import settings
-from django.http import FileResponse
+# from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, views, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
@@ -89,6 +89,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(
+        methods=["get"],
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+        url_path="download_shopping_cart",
+    )
+    def download_shopping_cart(self, request):
+        """The function returns the shopping list in a file."""
+        pass
+        # queryset = request.user.carts_user.all()
+        # ingredients = []
+        # for item in queryset:
+        #     recipe = Recipe.objects.get(id=item.recipe.id)
+        #     ingredients.append()
+        # return FileResponse(data, content_type="plain/text")
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """The class returns all or one tag."""
@@ -108,18 +124,13 @@ class IngredientViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
 
-class ShoppingCartViewSet(views.APIView):
-    """."""
-    # serializer_class = ShoppingCartSerializer
-    # pagination_class = None
-    # http_method_names = ["get"]
+# class ShoppingCartViewSet(views.APIView):
+#     """Model to get a shopping list."""
+#     # serializer_class = ShoppingCartSerializer
+#     # pagination_class = None
+#     # http_method_names = ["get"]
 
-    # def get_queryset(self):
-    #     """The function returns a set of queries containing all recipes
-    #     from the shopping list current user."""
-    #     return self.request.user.carts_user.all()
-
-    def get(self, request):
-        queryset = request.user.carts_user.all()
-        serializer = ShoppingCartSerializer(queryset, many=True)
-        return FileResponse(serializer.data, content_type="plain/text")
+#     # def get_queryset(self):
+#     #     """The function returns a set of queries containing all recipes
+#     #     from the shopping list current user."""
+#     #     return self.request.user.carts_user.all()

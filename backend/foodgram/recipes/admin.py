@@ -13,7 +13,8 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = ("author", "name", "tags")
 
     def in_favorite(self, instance):
-        """."""
+        """The function returns the number of times a recipe
+        has been added to favorites."""
         return instance.favorites_recipe.all().count()
 
 
