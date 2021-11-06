@@ -36,6 +36,9 @@ class Recipe(models.Model):
         verbose_name = "Рецепт"
         verbose_name_plural = "Рецепты"
 
+    def __str__(self):
+        return self.name
+
 
 class Tag(models.Model):
     """The model describes the tags for fetching by recipes."""
@@ -59,8 +62,8 @@ class Tag(models.Model):
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
 
-    # def __str__(self):
-    #     return self.name
+    def __str__(self):
+        return self.name
 
 
 class Ingredient(models.Model):
@@ -102,6 +105,9 @@ class IngredientAmount(models.Model):
     class Meta:
         verbose_name = "Количество ингредиента"
         verbose_name_plural = "Количества ингредиентов"
+
+    def __str__(self):
+        return self.ingredient.measurement_unit
 
 
 class ShoppingCart(models.Model):

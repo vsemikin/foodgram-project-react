@@ -10,7 +10,7 @@ SECRET_KEY = '#kwhhnz*r)4dvdev#64rdxtrnlf8e8he=q3dm8)hs9nk4d0cu!'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 INSTALLED_APPS = [
