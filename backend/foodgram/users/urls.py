@@ -11,6 +11,14 @@ urlpatterns = [
         FollowViewSet.as_view(({'get': 'list'})),
         name="Subscriptions"
     ),
-    path("", include(router.urls)),
     path("auth/", include("djoser.urls.authtoken")),
+    path("", include(router.urls)),
+    # path("users/", include([
+    #     path(
+    #         "subscriptions/",
+    #         FollowViewSet.as_view(({'get': 'list'})),
+    #         name="Subscriptions"
+    #     ),
+    #     path("auth/", include("djoser.urls.authtoken")),
+    # ])),
 ]

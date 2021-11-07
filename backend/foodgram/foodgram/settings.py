@@ -107,7 +107,6 @@ DJOSER = {
     # },
     # "HIDE_USERS": False,
     "PERMISSIONS": {
-        'token_create': ['rest_framework.permissions.IsAuthenticated'],
         'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
     },
 }
