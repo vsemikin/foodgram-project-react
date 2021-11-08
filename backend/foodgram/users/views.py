@@ -14,16 +14,16 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     http_method_names = ["get", "post", "delete"]
 
-    @action(
-        methods=["get"],
-        detail=False,
-        permission_classes=(IsAuthenticated,),
-        url_path="me",
-    )
-    def me(self, request):
-        """The function returns information about the current user."""
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
+    # @action(
+    #     methods=["get"],
+    #     detail=False,
+    #     permission_classes=(IsAuthenticated,),
+    #     url_path="me",
+    # )
+    # def me(self, request):
+    #     """The function returns information about the current user."""
+    #     serializer = UserSerializer(request.user)
+    #     return Response(serializer.data)
 
     @action(
         methods=["get", "delete"],

@@ -1,5 +1,6 @@
 from django.conf import settings
-# from django.http import FileResponse
+from django.http import HttpResponse
+# from wsgiref.util import FileWrapper
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -20,7 +21,7 @@ User = settings.AUTH_USER_MODEL
 class RecipeViewSet(viewsets.ModelViewSet):
     """The class returns all recipes or creates a new recipe or
     modifies a port."""
-    queryset = Recipe.objects.all()
+    queryset = Recipe.objects.all().order_by("-id")
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     filter_backends = (DjangoFilterBackend,)
@@ -97,13 +98,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         """The function returns the shopping list in a file."""
-        pass
-        # queryset = request.user.carts_user.all()
-        # ingredients = []
-        # for item in queryset:
-        #     recipe = Recipe.objects.get(id=item.recipe.id)
-        #     ingredients.append()
-        # return FileResponse(data, content_type="plain/text")
+        # shopping_cart = request.user.carts_user.all()
+        recipes = Recipe.objects.filter(author__carts_user__user=request.user)
+        # ingredients = recipes.ingredients.all()
+        ingredients = []
+        for item in recipes:
+            current_ingredients = item.ingredients.all().values()
+            current_ingredients_amount = item.recipes_amount.all().values()
+            ingredients.append(current_ingredients)
+        return HttpResponse(ingredients, content_type="plain/text")
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -134,3 +137,17 @@ class IngredientViewSet(viewsets.ModelViewSet):
 #     #     """The function returns a set of queries containing all recipes
 #     #     from the shopping list current user."""
 #     #     return self.request.user.carts_user.all()
+
+# from rest_framework import generics
+# from django.http import HttpResponse
+# from wsgiref.util import FileWrapper
+
+# class FileDownloadListAPIView(generics.ListAPIView):
+
+#     def get(self, request, id, format=None):
+#         queryset = Example.objects.get(id=id)
+#         file_handle = queryset.file.path
+#         document = open(file_handle, 'rb')
+#         response = HttpResponse(FileWrapper(document), content_type='application/msword')
+#         response['Content-Disposition'] = 'attachment; filename="%s"' % queryset.file.name
+#         return response
