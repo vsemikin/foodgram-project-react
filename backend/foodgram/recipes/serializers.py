@@ -83,12 +83,11 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         """The function returns the status of the recipe in the favorites."""
         request = self.context.get("request")
-        if request is None or request.user.is_anonymous:
-            return False
-        queryset = Favorite.objects.filter(
+        if request.user.is_anonymous or not Favorite.objects.filter(
             recipe=obj, user=request.user
-        ).exists()
-        return queryset
+        ).exists():
+            return False
+        return True
 
     def create(self, validated_data):
         """Recipe creation."""

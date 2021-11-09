@@ -25,19 +25,26 @@ class RecipeFilter(FilterSet):
         field_name="tags__slug",
         lookup_expr="iexact",
     )
-    # is_favorited = filters.BooleanFilter(method="filter_is_favorited")
+    is_favorited = filters.BooleanFilter(method="is_in_favorited")
     is_in_shopping_cart = filters.BooleanFilter(method="is_shopping_cart")
 
-    def is_shopping_cart(self, queryset, name, value):
-        """."""
+    def is_in_favorited(self, queryset, name, value):
+        """The method returns recipes from the favorited current user."""
         if value is True:
-            return queryset.filter(id__in=self.request.user.carts_user.all().values())
+            return queryset.filter(favorites_recipe__user=self.request.user)
+        return queryset
+
+    def is_shopping_cart(self, queryset, name, value):
+        """The method returns recipes from the current user's shopping list."""
+        if value is True:
+            return queryset.filter(carts__user=self.request.user)
+        return queryset
 
     class Meta:
         model = Recipe
         fields = [
             "author",
             "tags",
-            # "is_favorited",
+            "is_favorited",
             "is_in_shopping_cart",
         ]
