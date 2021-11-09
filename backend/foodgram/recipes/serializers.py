@@ -37,7 +37,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for the Recipe model."""
-    image = Base64ImageField()
+    image = Base64ImageField(use_url=True)
     author = UserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
         source="recipes_amount",
@@ -74,12 +74,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         """The function returns the status of the recipe
         in the shopping list."""
         request = self.context.get("request")
-        if request is None or request.user.is_anonymous:
-            return False
-        queryset = ShoppingCart.objects.filter(
+        if request.user.is_anonymous or not ShoppingCart.objects.filter(
             recipe=obj, user=request.user
-        ).exists()
-        return queryset
+        ).exists():
+            return False
+        return True
 
     def get_is_favorited(self, obj):
         """The function returns the status of the recipe in the favorites."""

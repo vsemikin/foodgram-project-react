@@ -26,10 +26,12 @@ class RecipeFilter(FilterSet):
         lookup_expr="iexact",
     )
     # is_favorited = filters.BooleanFilter(method="filter_is_favorited")
-    # is_in_shopping_cart = filters.CharFilter(
-    #     field_name="is_in_shopping_cart",
-    #     lookup_expr="iexact"
-    # )
+    is_in_shopping_cart = filters.BooleanFilter(method="is_shopping_cart")
+
+    def is_shopping_cart(self, queryset, name, value):
+        """."""
+        if value is True:
+            return queryset.filter(id__in=self.request.user.carts_user.all().values())
 
     class Meta:
         model = Recipe
@@ -37,12 +39,5 @@ class RecipeFilter(FilterSet):
             "author",
             "tags",
             # "is_favorited",
-            # "is_in_shopping_cart",
+            "is_in_shopping_cart",
         ]
-
-    # def filter_is_favorited(self, queryset, value):
-    #     """."""
-    #     request = self.context.get("request")
-    #     # if value is not None:
-    #     #     queryset = queryset.filter()
-    #     return request

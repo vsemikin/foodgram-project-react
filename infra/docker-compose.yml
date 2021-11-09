@@ -1,4 +1,8 @@
 version: '3.3'
+
+volumes:
+  media_value:
+
 services:
 
   frontend:
@@ -20,4 +24,6 @@ services:
     build:
       context: ../backend/foodgram
       dockerfile: Dockerfile
-    restart: always 
+    restart: always
+    volumes:
+      - media_value:/code/media/
