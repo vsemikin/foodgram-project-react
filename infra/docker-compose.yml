@@ -26,4 +26,4 @@ services:
       dockerfile: Dockerfile
     restart: always
     volumes:
-      - media_value:/code/media/
+      - media_value:/code/media/recipes/
