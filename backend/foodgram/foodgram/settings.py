@@ -1,16 +1,14 @@
 import os
 
-# from datetime import timedelta
-
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-SECRET_KEY = '#kwhhnz*r)4dvdev#64rdxtrnlf8e8he=q3dm8)hs9nk4d0cu!'
+SECRET_KEY = str(os.getenv('DJANGO_SECRET_KEY'))
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', default='*').split(', ')
 
 
 INSTALLED_APPS = [
@@ -67,6 +65,18 @@ DATABASES = {
 }
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DB_NAME'),
+#         'USER': os.getenv('POSTGRES_USER'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+#         'HOST': os.getenv('DB_HOST'),
+#         'PORT': os.getenv('DB_PORT'),
+#     }
+# }
+
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -107,7 +117,7 @@ DJOSER = {
     },
     "HIDE_USERS": False,
     "PERMISSIONS": {
-        'user': ['rest_framework.permissions.AllowAny'],
+        # 'user': ['rest_framework.permissions.AllowAny'],
         'user_list': ['rest_framework.permissions.AllowAny'],
     },
 }
