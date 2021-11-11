@@ -82,7 +82,7 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         """The function returns all the recipes of the blogger
         subscribed to."""
-        queryset = Recipe.objects.filter(author__following__user=obj.user)
+        queryset = Recipe.objects.filter(author__follower__user=obj.user)
         serializer = RecipeFollowSerializer(queryset, many=True)
         return serializer.data
 
