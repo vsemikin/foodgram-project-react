@@ -7,7 +7,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         """The function creates a permission at the object level that prohibits editing
         an objectthat is not its own."""
-        return (
-            (request.method in permissions.SAFE_METHODS)
-            or (obj.author == request.user)
+        return (request.method in permissions.SAFE_METHODS) or (
+            obj.author == request.user
         )

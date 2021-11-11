@@ -1,8 +1,10 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from .filters import FollowFilter
 from .models import Follow, User
 from .serializers import FollowSerializer, UserSerializer
 
@@ -55,6 +57,8 @@ class FollowViewSet(viewsets.ModelViewSet):
     creates a subscription."""
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = FollowFilter
     http_method_names = ["get"]
 
     def get_queryset(self):

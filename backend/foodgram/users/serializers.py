@@ -24,7 +24,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         """The function returns the subscription status."""
-        if Follow.objects.filter(following=obj):
+        current_user = self.context["request"].user
+        if Follow.objects.filter(following=obj, user=current_user).exists():
             return True
         return False
 
@@ -82,14 +83,14 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         """The function returns all the recipes of the blogger
         subscribed to."""
-        queryset = Recipe.objects.filter(author__follower__user=obj.user)
+        queryset = Recipe.objects.filter(author=obj.following)
         serializer = RecipeFollowSerializer(queryset, many=True)
         return serializer.data
 
     def get_recipes_count(self, obj):
         """The function returns the number of recipes of the blogger
         subscribed to."""
-        return Recipe.objects.filter(author__following__user=obj.user).count()
+        return Recipe.objects.filter(author=obj.following).count()
 
     def validate(self, data):
         """The function prohibits subscribing to yourself."""

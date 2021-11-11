@@ -8,7 +8,7 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
-from .models import Ingredient, Favorite, Recipe, ShoppingCart, Tag
+from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
@@ -20,6 +20,7 @@ User = settings.AUTH_USER_MODEL
 class RecipeViewSet(viewsets.ModelViewSet):
     """The class returns all recipes or creates a new recipe or
     modifies a port."""
+
     queryset = Recipe.objects.all().order_by("-id")
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
@@ -53,15 +54,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = self.get_object()
         if request.method == "GET":
             instance = ShoppingCart.objects.create(
-                recipe=recipe,
-                user=request.user
+                recipe=recipe, user=request.user
             )
             serializer = ShoppingCartSerializer(instance)
             return Response(serializer.data)
         else:
             instance = ShoppingCart.objects.filter(
-                recipe=recipe,
-                user=request.user
+                recipe=recipe, user=request.user
             )
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -76,15 +75,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = self.get_object()
         if request.method == "GET":
             instance = Favorite.objects.create(
-                recipe=recipe,
-                user=request.user
+                recipe=recipe, user=request.user
             )
             serializer = FavoriteSerializer(instance)
             return Response(serializer.data)
         else:
             instance = Favorite.objects.filter(
-                recipe=recipe,
-                user=request.user
+                recipe=recipe, user=request.user
             )
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -110,7 +107,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     shopping_cart[f"{name}({measurement_unit})"] += amount
                 else:
                     shopping_cart[f"{name}({measurement_unit})"] = amount
-        response = HttpResponse(content_type='.txt')
+        response = HttpResponse(content_type=".txt")
         response.write(
             "\n".join(
                 f"{key} — {value}" for key, value in shopping_cart.items()
@@ -121,6 +118,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 class TagViewSet(viewsets.ModelViewSet):
     """The class returns all or one tag."""
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
@@ -129,6 +127,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 class IngredientViewSet(viewsets.ModelViewSet):
     """The class return all or one Ingredient."""
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None

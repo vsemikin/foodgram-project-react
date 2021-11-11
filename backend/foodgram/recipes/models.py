@@ -8,10 +8,12 @@ User = settings.AUTH_USER_MODEL
 
 class Recipe(models.Model):
     """The model describes recipes published by the user."""
+
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE,
+        User,
+        on_delete=models.CASCADE,
         related_name="recipes",
-        verbose_name="Автор публикации"
+        verbose_name="Автор публикации",
     )
     name = models.CharField("Название", max_length=200, unique=True)
     image = models.ImageField("Картинка", upload_to="recipes/")
@@ -21,15 +23,17 @@ class Recipe(models.Model):
         verbose_name="Теги"
     )
     ingredients = models.ManyToManyField(
-        "Ingredient", through="IngredientAmount",
+        "Ingredient",
+        through="IngredientAmount",
         related_name="ingredients",
-        verbose_name="Ингридиенты"
+        verbose_name="Ингридиенты",
     )
     cooking_time = models.PositiveSmallIntegerField(
-        validators=[
-            MinValueValidator(limit_value=1, message="Time smaller 1")
-        ],
-        verbose_name="Время приготовления"
+        validators=[MinValueValidator(
+            limit_value=1,
+            message="Time smaller 1"
+        )],
+        verbose_name="Время приготовления",
     )
 
     class Meta:
@@ -42,14 +46,10 @@ class Recipe(models.Model):
 
 class Tag(models.Model):
     """The model describes the tags for fetching by recipes."""
+
     name = models.CharField("Название", max_length=200, unique=True)
-    color = models.CharField(
-        "Цвет", max_length=7
-    )
-    slug = models.SlugField(
-        "Ярлык", unique=True,
-        max_length=200
-    )
+    color = models.CharField("Цвет", max_length=7)
+    slug = models.SlugField("Ярлык", unique=True, max_length=200)
 
     def colored_name(self):
         """Color in format HEX."""
@@ -68,11 +68,10 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     """The model describes the recipe ingredient."""
+
     name = models.CharField("Название", max_length=200, unique=True)
     measurement_unit = models.CharField(
-        "Единицы измерения",
-        max_length=200,
-        default="шт"
+        "Единицы измерения", max_length=200, default="шт"
     )
 
     class Meta:
@@ -85,21 +84,25 @@ class Ingredient(models.Model):
 
 class IngredientAmount(models.Model):
     """Model for describing the amount of ingredients."""
+
     ingredient = models.ForeignKey(
-        Ingredient, on_delete=models.CASCADE,
+        Ingredient,
+        on_delete=models.CASCADE,
         related_name="ingredients_amount",
-        verbose_name="Ингредиент"
+        verbose_name="Ингредиент",
     )
     recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE,
+        Recipe,
+        on_delete=models.CASCADE,
         related_name="recipes_amount",
-        verbose_name="Рецепт"
+        verbose_name="Рецепт",
     )
     amount = models.PositiveSmallIntegerField(
-        validators=[
-            MinValueValidator(limit_value=1, message="Amount smaller 1")
-        ],
-        verbose_name="Количество"
+        validators=[MinValueValidator(
+            limit_value=1,
+            message="Amount smaller 1"
+        )],
+        verbose_name="Количество",
     )
 
     class Meta:
@@ -112,15 +115,17 @@ class IngredientAmount(models.Model):
 
 class ShoppingCart(models.Model):
     """The model describes the user's shopping list."""
+
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE,
         related_name="carts",
         verbose_name=" Рецепт"
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE,
+        User,
+        on_delete=models.CASCADE,
         related_name="carts_user",
-        verbose_name="Пользователь"
+        verbose_name="Пользователь",
     )
 
     class Meta:
@@ -135,15 +140,18 @@ class ShoppingCart(models.Model):
 
 class Favorite(models.Model):
     """The model describes the user's favorites section."""
+
     recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE,
+        Recipe,
+        on_delete=models.CASCADE,
         related_name="favorites_recipe",
-        verbose_name=" Рецепт"
+        verbose_name=" Рецепт",
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE,
+        User,
+        on_delete=models.CASCADE,
         related_name="favorites_user",
-        verbose_name="Автор публикации"
+        verbose_name="Автор публикации",
     )
 
     class Meta:
