@@ -24,10 +24,12 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         """The function returns the subscription status."""
-        current_user = self.context["request"].user
-        if Follow.objects.filter(following=obj, user=current_user).exists():
-            return True
-        return False
+        request = self.context.get("request")
+        if request.user.is_anonymous or not Follow.objects.filter(
+            following=obj, user=request.user
+        ).exists():
+            return False
+        return True
 
     def create(self, validated_data):
         """Function for hashing the user's password."""
