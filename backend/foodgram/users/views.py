@@ -1,12 +1,10 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .filters import FollowFilter
 from .models import Follow, User
-from .serializers import UserFollowSerializer, UserSerializer
+from .serializers import FollowSerializer, UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -15,17 +13,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
     http_method_names = ["get", "post", "delete"]
-
-    # @action(
-    #     methods=["get"],
-    #     detail=False,
-    #     permission_classes=(IsAuthenticated,),
-    #     url_path="me",
-    # )
-    # def me(self, request):
-    #     """The function returns information about the current user."""
-    #     serializer = UserSerializer(request.user)
-    #     return Response(serializer.data)
 
     @action(
         methods=["get", "delete"],
@@ -41,8 +28,11 @@ class UserViewSet(viewsets.ModelViewSet):
                 following=blogger,
                 user=request.user
             )
-            subscriptions = User.objects.filter(following__user=request.user)
-            serializer = UserFollowSerializer(subscriptions)
+            subscriptions = User.objects.get(username=blogger)
+            serializer = FollowSerializer(
+                subscriptions,
+                context={"request": request}
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             instance = Follow.objects.filter(
@@ -52,26 +42,12 @@ class UserViewSet(viewsets.ModelViewSet):
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # @action(
-    #     methods=["get"],
-    #     detail=False,
-    #     permission_classes=(IsAuthenticated,),
-    #     url_path="subscriptions"
-    # )
-    # def subscriptions(self, request):
-    #     """The function returns all subscriptions."""
-    #     subscriptions = request.user.follower.all()
-    #     serializer = UserSerializer(subscriptions)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 class FollowViewSet(viewsets.ModelViewSet):
     """The class returns a list of all subscribers and
     creates a subscription."""
-    serializer_class = UserFollowSerializer
+    serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend,)
-    filterset_class = FollowFilter
     http_method_names = ["get"]
 
     def get_queryset(self):
