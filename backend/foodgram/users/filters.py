@@ -1,6 +1,7 @@
 from django_filters import FilterSet, filters
 
-from .models import Follow
+from .models import User
+# from recipes.models import Recipe
 
 
 class FollowFilter(FilterSet):
@@ -9,8 +10,10 @@ class FollowFilter(FilterSet):
 
     def limit(self, queryset, name, value):
         """The method limits the number of recipes in the profile."""
-        return queryset.filter()
+        # recipes = Recipe.objects.all().filter(author=self.request.user)
+        # return queryset.filter(following__recipes__in=recipes[:value])
+        return queryset.recipes.all()[:value]
 
     class Meta:
-        model = Follow
+        model = User
         fields = ["recipes_limit"]

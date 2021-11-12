@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from .filters import FollowFilter
 from .models import Follow, User
-from .serializers import FollowSerializer, UserSerializer
+from .serializers import UserFollowSerializer, UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -41,7 +41,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 following=blogger,
                 user=request.user
             )
-            serializer = FollowSerializer(instance)
+            subscriptions = User.objects.filter(following__user=request.user)
+            serializer = UserFollowSerializer(subscriptions)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             instance = Follow.objects.filter(
@@ -51,11 +52,23 @@ class UserViewSet(viewsets.ModelViewSet):
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+    # @action(
+    #     methods=["get"],
+    #     detail=False,
+    #     permission_classes=(IsAuthenticated,),
+    #     url_path="subscriptions"
+    # )
+    # def subscriptions(self, request):
+    #     """The function returns all subscriptions."""
+    #     subscriptions = request.user.follower.all()
+    #     serializer = UserSerializer(subscriptions)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class FollowViewSet(viewsets.ModelViewSet):
     """The class returns a list of all subscribers and
     creates a subscription."""
-    serializer_class = FollowSerializer
+    serializer_class = UserFollowSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = FollowFilter
@@ -64,4 +77,4 @@ class FollowViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """The function returns a queryset containing all subscribers
         of the current user."""
-        return self.request.user.follower.all()
+        return User.objects.filter(following__user=self.request.user)

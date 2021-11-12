@@ -50,6 +50,54 @@ class RecipeFollowSerializer(serializers.ModelSerializer):
         model = Recipe
 
 
+class UserFollowSerializer(serializers.ModelSerializer):
+    """."""
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+    recipes = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        fields = (
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "is_subscribed",
+            "recipes",
+            "recipes_count"
+        )
+        read_only_fields = (
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name"
+        )
+        model = User
+
+    def get_is_subscribed(self, obj):
+        """The function returns the subscription status."""
+        request = self.context.get("request")
+        if request.user.is_anonymous or not Follow.objects.filter(
+            following=obj, user=request.user
+        ).exists():
+            return False
+        return True
+
+    def get_recipes(self, obj):
+        """The function returns all the recipes of the blogger
+        subscribed to."""
+        queryset = Recipe.objects.filter(author=obj)
+        serializer = RecipeFollowSerializer(queryset, many=True)
+        return serializer.data
+
+    def get_recipes_count(self, obj):
+        """The function returns the number of recipes of the blogger
+        subscribed to."""
+        return Recipe.objects.filter(author=obj).count()
+
+
 class FollowSerializer(serializers.ModelSerializer):
     """Serializer for the Follow model."""
     email = serializers.ReadOnlyField(source="following.email")
