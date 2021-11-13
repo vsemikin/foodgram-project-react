@@ -58,12 +58,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
             serializer = ShoppingCartSerializer(instance)
             return Response(serializer.data)
-        else:
-            instance = ShoppingCart.objects.filter(
-                recipe=recipe, user=request.user
-            )
-            instance.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        instance = ShoppingCart.objects.filter(
+            recipe=recipe, user=request.user
+        )
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=True,
@@ -80,12 +79,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
             serializer = FavoriteSerializer(instance)
             return Response(serializer.data)
-        else:
-            instance = Favorite.objects.filter(
-                recipe=recipe, user=request.user
-            )
-            instance.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        instance = Favorite.objects.filter(
+            recipe=recipe, user=request.user
+        )
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         methods=["get"],

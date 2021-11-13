@@ -34,13 +34,12 @@ class UserViewSet(viewsets.ModelViewSet):
                 context={"request": request}
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            instance = Follow.objects.filter(
-                following=blogger,
-                user=request.user
-            )
-            instance.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        instance = Follow.objects.filter(
+            following=blogger,
+            user=request.user
+        )
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FollowViewSet(viewsets.ModelViewSet):

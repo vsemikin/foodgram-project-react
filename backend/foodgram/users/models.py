@@ -18,7 +18,7 @@ class User(AbstractUser):
     email = models.EmailField("Email", max_length=254, unique=True)
     first_name = models.CharField("Имя", max_length=150)
     last_name = models.CharField("Фамилия", max_length=150)
-    is_staff = models.BooleanField(default=False)
+    is_staff = models.BooleanField("Администратор", default=False)
 
     class Meta:
         ordering = ["id"]
