@@ -57,7 +57,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 recipe=recipe, user=request.user
             )
             serializer = ShoppingCartSerializer(instance)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         instance = ShoppingCart.objects.filter(
             recipe=recipe, user=request.user
         )
@@ -78,7 +78,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 recipe=recipe, user=request.user
             )
             serializer = FavoriteSerializer(instance)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         instance = Favorite.objects.filter(
             recipe=recipe, user=request.user
         )
