@@ -1,3 +1,5 @@
+# from django.conf import settings
+# from django.conf.urls.static import static
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
@@ -9,12 +11,6 @@ router.register("tags", TagViewSet, basename="Tag")
 router.register("ingredients", IngredientViewSet, basename="Ingredient")
 
 urlpatterns = [
-    # path(
-    #     "recipes/download_shopping_cart/",
-    #     # ShoppingCartViewSet.as_view({"get": "list"}),
-    #     ShoppingCartViewSet.as_view(),
-    #     name="ShoppingCartDownload"
-    # ),
     path("", include(router.urls)),
-    # path("", include("users.urls")),
 ]
+# + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
