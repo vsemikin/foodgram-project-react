@@ -11,7 +11,7 @@ https://docs.docker.com/engine/install/ubuntu/
 
 ### Что должен содержать файл .env:
 
-Файл .env содержит переменные окружения для работы с базой данных:
+Файл .env сохранитиь в директории /foodgram-project-react/infra:
 
 ```yaml
 DJANGO_SECRET_KEY # секретный ключ проекта
