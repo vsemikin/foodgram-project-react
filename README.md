@@ -25,23 +25,22 @@ DB_PORT # порт для подключения к БД
 
 ### Запуск проекта:
 
-Для запуска проекта необходимо перейти в директорию  
-/foodgram-project-react/infra и выполнить команду:
+Для запуска проекта необходимо перейти в директорию /foodgram-project-react/infra и выполнить команду:
 
 ```bash
 docker-compose up
-```
-
-Пересобрать проект:
-
-```bash
-docker-compose up --build
 ```
 
 Остановка:
 
 ```bash
 docker-compose down
+```
+
+Пересобрать проект:
+
+```bash
+docker-compose up --build
 ```
 
 ### Команды для docker:
@@ -58,13 +57,12 @@ docker ps
 docker exec -it <CONTAINER ID> bash
 ```
 
-Находясь в контейнере провести миграции, сформировать базу и  
-собрать статику:
+Находясь в контейнере провести миграции, сформировать базу и собрать статику:
 
 ```bash
-python manage.py makemigrations # миграции
-python manage.py migrate # создать таблицы базы данных из миграций
-python manage.py collectstatic # собрать статику для панели администратора
+python3 manage.py makemigrations # миграции
+python3 manage.py migrate # создать таблицы базы данных из миграций
+python3 manage.py collectstatic # собрать статику для панели администратора
 ```
 
 ### Технологии проекта:
