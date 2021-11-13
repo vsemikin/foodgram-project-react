@@ -1,4 +1,3 @@
-# import base64
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from users.serializers import UserSerializer
@@ -41,7 +40,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for the Recipe model."""
 
     image = Base64ImageField()
-    # image = serializers.ImageField()
     author = UserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
         source="recipes_amount",
@@ -68,12 +66,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             "cooking_time",
         )
         model = Recipe
-
-    # def to_internal_value(self, data):
-    #     """."""
-    #     image_data = data.get("image")
-    #     image_decod = base64.b64decode(image_data)
-    #     image = open()
 
     def to_representation(self, obj):
         """The function converts tag id to tag serializer representation."""

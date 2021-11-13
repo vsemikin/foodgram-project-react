@@ -87,7 +87,7 @@ class FollowSerializer(serializers.ModelSerializer):
         """The function returns all the recipes of the blogger
         subscribed to."""
         query_params = self.context["request"].query_params
-        queryset = Recipe.objects.filter(author=obj)
+        queryset = Recipe.objects.filter(author=obj).order_by("-id")
         if query_params:
             value = int(query_params["recipes_limit"])
             queryset = queryset[:value]
