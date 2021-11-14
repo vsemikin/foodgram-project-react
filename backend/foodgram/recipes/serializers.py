@@ -87,44 +87,37 @@ class RecipeSerializer(serializers.ModelSerializer):
             recipe=obj, user=request.user
         ).exists()
 
-    def create(self, validated_data):
-        """Recipe creation."""
-        ingredients_data = validated_data.pop("recipes_amount")
-        tags_data = validated_data.pop("tags")
-        recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags_data)
-        for item in ingredients_data:
+    def create_ingredient_amount(self, ingredients, recipe):
+        """Method for creating a model object IngredientAmount."""
+        for item in ingredients:
             current_ingredient = Ingredient(id=item["ingredient"]["id"])
             IngredientAmount.objects.create(
                 ingredient=current_ingredient,
                 recipe=recipe,
                 amount=item["amount"]
             )
+
+    def create(self, validated_data):
+        """Recipe creation."""
+        ingredients_data = validated_data.pop("recipes_amount")
+        tags_data = validated_data.pop("tags")
+        recipe = Recipe.objects.create(**validated_data)
+        recipe.tags.set(tags_data)
+        self.create_ingredient_amount(ingredients_data, recipe)
         return recipe
 
     def update(self, instance, validated_data):
         """Recipe update."""
         ingredients_data = validated_data.pop("recipes_amount")
-        ingredients = (instance.recipes_amount).all()
-        ingredients = list(ingredients)
         tags_data = validated_data.pop("tags")
-        instance.name = validated_data.get("name", instance.name)
-        instance.image = validated_data.get("image", instance.image)
-        instance.text = validated_data.get("text", instance.text)
-        instance.cooking_time = validated_data.get(
-            "cooking_time", instance.cooking_time
+        instance = super(RecipeSerializer, self).update(
+            instance, validated_data
         )
         instance.tags.clear()
         instance.tags.set(tags_data)
         instance.save()
         instance.ingredients.clear()
-        for item in ingredients_data:
-            current_ingredient = Ingredient(id=item["ingredient"]["id"])
-            IngredientAmount.objects.create(
-                ingredient=current_ingredient,
-                recipe=instance,
-                amount=item["amount"]
-            )
+        self.create_ingredient_amount(ingredients_data, instance)
         return instance
 
     def validate_ingredients(self, data):

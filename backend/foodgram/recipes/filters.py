@@ -26,13 +26,13 @@ class RecipeFilter(FilterSet):
 
     def is_in_favorited(self, queryset, name, value):
         """The method returns recipes from the favorited current user."""
-        if value is True:
+        if value:
             return queryset.filter(favorites_recipe__user=self.request.user)
         return queryset
 
     def is_shopping_cart(self, queryset, name, value):
         """The method returns recipes from the current user's shopping list."""
-        if value is True:
+        if value:
             return queryset.filter(carts__user=self.request.user)
         return queryset
 
