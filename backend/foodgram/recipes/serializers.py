@@ -1,7 +1,7 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from users.serializers import UserSerializer
 
+from users.serializers import UserSerializer
 from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
                      ShoppingCart, Tag)
 
@@ -76,20 +76,16 @@ class RecipeSerializer(serializers.ModelSerializer):
         """The function returns the status of the recipe
         in the shopping list."""
         request = self.context.get("request")
-        if request.user.is_anonymous or not ShoppingCart.objects.filter(
+        return not request.user.is_anonymous and ShoppingCart.objects.filter(
             recipe=obj, user=request.user
-        ).exists():
-            return False
-        return True
+        ).exists()
 
     def get_is_favorited(self, obj):
         """The function returns the status of the recipe in the favorites."""
         request = self.context.get("request")
-        if request.user.is_anonymous or not Favorite.objects.filter(
+        return not request.user.is_anonymous and Favorite.objects.filter(
             recipe=obj, user=request.user
-        ).exists():
-            return False
-        return True
+        ).exists()
 
     def create(self, validated_data):
         """Recipe creation."""
@@ -130,6 +126,36 @@ class RecipeSerializer(serializers.ModelSerializer):
                 amount=item["amount"]
             )
         return instance
+
+    def validate_ingredients(self, data):
+        """Method for checking duplicate ingredients."""
+        ingredients = []
+        for ingredient in data:
+            if ingredient["ingredient"]["id"] in ingredients:
+                raise serializers.ValidationError(
+                    "Ingredients contain duplicates"
+                )
+            ingredients.append(ingredient["ingredient"]["id"])
+        return data
+
+    def validate_tags(self, data):
+        """Method for checking duplicate tags."""
+        tags = []
+        for tag in data:
+            if tag in tags:
+                raise serializers.ValidationError(
+                    "Tags contain duplicates"
+                )
+            tags.append(tag)
+        return data
+
+    def validate_cooking_time(self, data):
+        """Method for checking the cooking time field."""
+        if data < 1:
+            raise serializers.ValidationError(
+                "Cooking time cannot be less than 1"
+            )
+        return data
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
