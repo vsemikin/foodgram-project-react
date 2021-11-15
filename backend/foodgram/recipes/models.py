@@ -19,13 +19,13 @@ class Recipe(models.Model):
     image = models.ImageField("Картинка", upload_to="recipes/")
     text = models.TextField("Текстовое описание")
     tags = models.ManyToManyField(
-        "Tag", related_name="tags",
+        "Tag", related_name="recipes_tag",
         verbose_name="Теги"
     )
     ingredients = models.ManyToManyField(
         "Ingredient",
         through="IngredientAmount",
-        related_name="ingredients",
+        related_name="recipes_ingredient",
         verbose_name="Ингридиенты",
     )
     cooking_time = models.PositiveSmallIntegerField(
@@ -106,6 +106,12 @@ class IngredientAmount(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["ingredient", "recipe"],
+                name='unique_pair'
+            )
+        ]
         verbose_name = "Количество ингредиента"
         verbose_name_plural = "Количества ингредиентов"
 
@@ -128,6 +134,14 @@ class ShoppingCart(models.Model):
         verbose_name="Пользователь",
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["recipe", "user"],
+                name='unique_pair'
+            )
+        ]
+
 
 class Favorite(models.Model):
     """The model describes the user's favorites section."""
@@ -146,4 +160,10 @@ class Favorite(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["recipe", "user"],
+                name='unique_pair'
+            )
+        ]
         verbose_name = "Избранное"
