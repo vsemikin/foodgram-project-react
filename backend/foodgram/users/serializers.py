@@ -25,11 +25,9 @@ class UserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         """The function returns the subscription status."""
         request = self.context.get("request")
-        if request.user.is_anonymous or not Follow.objects.filter(
+        return not request.user.is_anonymous and Follow.objects.filter(
             following=obj, user=request.user
-        ).exists():
-            return False
-        return True
+        ).exists()
 
     def create(self, validated_data):
         """Function for hashing the user's password."""
@@ -79,9 +77,7 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         """The function returns the subscription status."""
         request = self.context.get("request")
-        if Follow.objects.filter(following=obj, user=request.user).exists():
-            return True
-        return False
+        return Follow.objects.filter(following=obj, user=request.user).exists()
 
     def get_recipes(self, obj):
         """The function returns all the recipes of the blogger

@@ -8,7 +8,8 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
-from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                     ShoppingCart, Tag)
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
@@ -94,18 +95,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         """The function returns the shopping list in a file."""
         shopping_cart = {}
-        recipes = ShoppingCart.objects.filter(user=request.user)
-        for item in recipes:
-            ingredients = item.recipe.ingredients.all().values()
-            ingredients_amount = item.recipe.recipes_amount.all().values()
-            for idx in range(len(ingredients)):
-                name = ingredients[idx]["name"]
-                amount = ingredients_amount[idx]["amount"]
-                measurement_unit = ingredients[idx]["measurement_unit"]
-                if f"{name}({measurement_unit})" in shopping_cart:
-                    shopping_cart[f"{name}({measurement_unit})"] += amount
-                else:
-                    shopping_cart[f"{name}({measurement_unit})"] = amount
+        ingredients = IngredientAmount.objects.filter(
+            recipe__carts__user=request.user
+        )
+        for item in ingredients:
+            name = item.ingredient.name
+            measurement_unit = item.ingredient.measurement_unit
+            amount = item.amount
+            if f"{name}({measurement_unit})" in shopping_cart:
+                shopping_cart[f"{name}({measurement_unit})"] += amount
+            else:
+                shopping_cart[f"{name}({measurement_unit})"] = amount
         response = HttpResponse(content_type=".txt")
         response.write(
             "\n".join(

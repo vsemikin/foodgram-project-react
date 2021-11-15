@@ -28,9 +28,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 following=blogger,
                 user=request.user
             )
-            subscriptions = User.objects.get(username=blogger)
             serializer = FollowSerializer(
-                subscriptions,
+                blogger,
                 context={"request": request}
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
