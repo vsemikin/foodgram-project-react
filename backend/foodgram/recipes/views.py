@@ -31,6 +31,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         "get",
         "post",
         "put",
+        "patch",
         "delete",
     ]
 
