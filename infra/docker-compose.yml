@@ -24,7 +24,7 @@ services:
       - ./.env
 
   web:
-    image: vsemikin/api_foodgram:latest
+    image: vsemikin/api_foodgram:v1.2
     restart: always
     volumes:
       - media_value:/code/media/
