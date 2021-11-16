@@ -24,9 +24,7 @@ services:
       - ./.env
 
   web:
-    build:
-      context: ../backend/foodgram
-      dockerfile: Dockerfile
+    image: vsemikin/api_foodgram:latest
     restart: always
     volumes:
       - media_value:/code/media/
