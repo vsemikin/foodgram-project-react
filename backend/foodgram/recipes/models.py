@@ -19,13 +19,13 @@ class Recipe(models.Model):
     image = models.ImageField("Картинка", upload_to="recipes/")
     text = models.TextField("Текстовое описание")
     tags = models.ManyToManyField(
-        "Tag", related_name="recipes_tag",
+        "Tag", related_name="recipes",
         verbose_name="Теги"
     )
     ingredients = models.ManyToManyField(
         "Ingredient",
         through="IngredientAmount",
-        related_name="recipes_ingredient",
+        related_name="recipes",
         verbose_name="Ингридиенты",
     )
     cooking_time = models.PositiveSmallIntegerField(

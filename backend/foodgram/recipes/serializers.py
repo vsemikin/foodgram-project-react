@@ -102,7 +102,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients_data = validated_data.pop("recipes_amount")
         tags_data = validated_data.pop("tags")
         recipe = Recipe.objects.create(**validated_data)
-        recipe.recipes_tag.set(tags_data)
+        recipe.tags.set(tags_data)
         self.create_ingredient_amount(ingredients_data, recipe)
         return recipe
 
@@ -110,13 +110,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         """Recipe update."""
         ingredients_data = validated_data.pop("recipes_amount")
         tags_data = validated_data.pop("tags")
-        instance = super(RecipeSerializer, self).update(
-            instance, validated_data
-        )
-        instance.recipes_tag.clear()
-        instance.recipes_tag.set(tags_data)
-        instance.save()
-        instance.recipes_ingredient.clear()
+        instance = super().update(instance, validated_data)
+        instance.tags.clear()
+        instance.tags.set(tags_data)
+        instance.ingredients.clear()
         self.create_ingredient_amount(ingredients_data, instance)
         return instance
 
@@ -127,6 +124,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             if ingredient["ingredient"]["id"] in ingredients:
                 raise serializers.ValidationError(
                     "Ingredients contain duplicates"
+                )
+            if ingredient["amount"] < 1:
+                raise serializers.ValidationError(
+                    "The amount of ingredient must not be less than 1"
                 )
             ingredients.append(ingredient["ingredient"]["id"])
         return data

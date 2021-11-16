@@ -97,11 +97,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         shopping_cart = {}
         ingredients = IngredientAmount.objects.filter(
             recipe__carts__user=request.user
+        ).values_list(
+            "ingredient_id__name", "ingredient_id__measurement_unit", "amount"
         )
         for item in ingredients:
-            name = item.ingredient.name
-            measurement_unit = item.ingredient.measurement_unit
-            amount = item.amount
+            name, measurement_unit, amount = item
             if f"{name}({measurement_unit})" in shopping_cart:
                 shopping_cart[f"{name}({measurement_unit})"] += amount
             else:
